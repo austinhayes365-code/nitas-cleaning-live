@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Admin – Nita’s Cleaning</title>
+  <style>
+    body { font-family: system-ui; background:#f3f4f6; padding:20px }
+    h1 { margin-bottom:10px }
+    .card { background:#fff; padding:14px; border-radius:12px; margin-bottom:12px }
+    button { padding:8px 12px; border-radius:8px; border:1px solid #ccc; cursor:pointer }
+  </style>
+</head>
+<body>
+  <h1>Pending Booking Requests</h1>
+  <div id="list">Loading…</div>
+
+<script>
+  const ADMIN_KEY = prompt("Enter admin key:");
+
+  async function load() {
+    const el = document.getElementById('list');
+    try {
+      const res = await fetch('/api/admin/requests', {
+        headers: { 'x-admin-key': ADMIN_KEY || '' }
+      });
+
+      // If server returns HTML (like a 404 page), this will fail unless we handle it:
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch { data = { ok:false, error:text.slice(0,200) }; }
+
+      if (!res.ok || !data.ok) {
+        el.innerText = `Error (${res.status}): ${data.error || 'Unauthorized'}`;
+        return;
+      }
+
+      if (!data.pending || data.pending.length === 0) {
+        el.innerText = 'No pending requests.';
+        return;
+      }
+
+      el.innerHTML = data.pending.map(r => `
+        <div class="card">
+          <b>${r.name}</b> – ${r.service}<br/>
+          ${new Date(r.startAt).toLocaleString()}<br/>
+          ${r.email}<br/><br/>
+          <button onclick="approve('${r.id}')">Approve</button>
+        </div>
+      `).join('');
+    } catch (e) {
+      el.innerText = `Error: ${e.message}`;
+    }
+  }
+
+  async function approve(id) {
+    await fetch('/api/admin/approve', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-key': ADMIN_KEY || ''
+      },
+      body: JSON.stringify({ booking_request_id: id })
+    });
+    load();
+  }
+
+  load();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="https://web.squarecdn.com/v1/square.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nita’s Cleaning</title>
+  <meta name="description" content="Nita’s Cleaning — Bedroom, Windows, Office, Commercial, Full Home. 10+ years experience." />
+  <style>
+    :root{
+      --bg:#f3f4f6;            /* light gray background */
+      --text:#111827;          /* near-black text */
+      --muted:#4b5563;         /* muted gray text */
+      --line:#e5e7eb;          /* subtle borders */
+      --accent:#dc2626;        /* red accent */
+      --accent2:#b91c1c;       /* darker red hover */
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
+    a{color:inherit}
+    .wrap{max-width:820px;margin:0 auto;padding:22px}
+
+    /* Minimal top bar */
+    header{position:sticky;top:0;background:rgba(243,244,246,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    nav{display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .links{display:flex;gap:14px;flex-wrap:wrap}
+    .links a{text-decoration:none;color:var(--muted);font-size:14px}
+    .links a:hover{color:var(--text)}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--text);font-weight:650;text-decoration:none;cursor:pointer}
+    .btnPrimary{background:var(--accent);border-color:var(--accent);color:#fff}
+    .btnPrimary:hover{background:var(--accent2);border-color:var(--accent2)}
+    .btnPrimary:hover{background:var(--accent2);border-color:var(--accent2)}
+
+    /* Layout */
+    .hero{padding:34px 0 18px}
+    h1{margin:0 0 8px;font-size:40px;letter-spacing:-.03em;line-height:1.1}
+    .sub{margin:0;color:var(--muted);line-height:1.65;font-size:16px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+    section{padding:28px 0;border-top:1px solid var(--line)}
+    h2{margin:0 0 10px;font-size:20px;letter-spacing:-.01em}
+
+    /* Simple lists/cards */
+    .box{border:1px solid var(--line);border-radius:var(--radius);padding:16px;background:#fff}
+    .list{margin:0;padding-left:18px;color:var(--muted);line-height:1.9}
+
+    form{display:grid;gap:10px}
+    label{font-size:12px;color:var(--muted)}
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    input:focus, select:focus, textarea:focus{border-color:rgba(220,38,38,.55);box-shadow:0 0 0 4px rgba(220,38,38,.15)}
+    textarea{min-height:110px;resize:vertical}
+
+    .notice{display:none;margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#f8fafc;color:var(--muted)}
+    .notice strong{color:var(--text)}
+
+    footer{padding:18px 0;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+
+    @media (max-width:640px){
+      h1{font-size:34px}
+      .wrap{padding:18px}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="brand">Nita’s Cleaning</div>
+      <div class="links">
+        <a href="#services">Services</a>
+        <a href="#booking">Booking</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" style="border-top:none">
+    <h1>Reliable cleaning, done right.</h1>
+    <p class="sub">Bedroom • Windows • Office • Commercial • Full Home • <strong>10+ years experience</strong></p>
+    <div class="row">
+      <a class="btn btnPrimary" href="#booking">Request a Cleaning</a>
+      <a class="btn" href="#contact">Get a Quote</a>
+    </div>
+  </section>
+
+  <section id="services">
+    <h2>Services</h2>
+    <div class="box">
+      <ul class="list">
+        <li>Full Home</li>
+        <li>Bedroom</li>
+        <li>Windows</li>
+        <li>Office</li>
+        <li>Commercial</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="booking">
+    <h2>Booking</h2>
+    <p class="sub" style="margin:0 0 12px">
+      Request a date/time → we approve → you pay a deposit on this site.
+    </p>
+
+    <div class="box">
+      <form id="requestForm">
+        <div>
+          <label>Service</label>
+          <select id="service" required>
+            <option value="" disabled selected>Select a service</option>
+            <option value="full_home">Full Home</option>
+            <option value="bedroom">Bedroom</option>
+            <option value="windows">Windows</option>
+            <option value="office">Office</option>
+            <option value="commercial">Commercial</option>
+          </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label>Date</label>
+            <input id="date" type="date" required />
+          </div>
+          <div>
+            <label>Time</label>
+            <input id="time" type="time" required />
+          </div>
+        </div>
+
+        <div>
+          <label>Name</label>
+          <input id="name" required placeholder="Your name" />
+        </div>
+        <div>
+          <label>Email</label>
+          <input id="email" type="email" required placeholder="you@example.com" />
+        </div>
+        <div>
+          <label>Notes (optional)</label>
+          <textarea id="notes" placeholder="Square footage, number of rooms, pets, parking, etc."></textarea>
+        </div>
+
+        <button class="btn btnPrimary" type="submit">Submit Request</button>
+        <div id="requestMsg" class="notice"></div>
+      </form>
+
+      <hr style="border:none;border-top:1px solid var(--line);margin:16px 0" />
+
+      <div>
+  <h2 style="font-size:16px;margin:0 0 8px">Deposit (after approval)</h2>
+  <p class="sub" style="margin:0 0 10px" id="depositStatusText">Checking approval status…</p>
+
+  <div id="card-container" style="margin:10px 0;"></div>
+  <button class="btn btnPrimary" id="payDepositBtn" type="button" style="display:none">Pay $1 Deposit</button>
+
+  <div id="depositMsg" class="notice"></div>
+</div>
+
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <div class="box">
+      <div class="sub" style="margin:0">
+        Phone: (add number)<br/>
+        Email: (add email)<br/>
+        Service area: (add city/area)
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © <span id="y"></span> Nita’s Cleaning
+  </footer>
+</main>
+
+<script>
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+requestForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  requestMsg.style.display = 'block';
+  requestMsg.innerHTML = '<strong>Submitting…</strong>';
+
+  const payload = {
+    service: document.getElementById('service').value,
+    date: document.getElementById('date').value,
+    time: document.getElementById('time').value,
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    notes: document.getElementById('notes').value || "",
+  };
+
+  try {
+    const resp = await fetch('/api/booking/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await resp.json();
+
+    if (!resp.ok || !data.ok) throw new Error(data.error || `Request failed (${resp.status})`);
+
+    localStorage.setItem('booking_request_id', data.booking_request_id);
+
+    requestMsg.innerHTML =
+      `<strong>Request received.</strong> Status: ${data.status}. ` +
+      `Request ID: <span style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace">${data.booking_request_id}</span>`;
+  } catch (err) {
+    requestMsg.innerHTML = `<strong>Error:</strong> ${err.message}`;
+  }
+});
+
+  const depositMsg = document.getElementById('depositMsg');
+const payBtn = document.getElementById('payDepositBtn');
+const statusText = document.getElementById('depositStatusText');
+
+async function setupDepositUI() {
+  const bookingId = localStorage.getItem('booking_request_id');
+  if (!bookingId) {
+    statusText.textContent = "Submit a booking request first.";
+    return;
+  }
+
+  const s = await fetch(`/api/booking/status?id=${encodeURIComponent(bookingId)}`);
+  const data = await s.json();
+
+  if (!s.ok || !data.ok) {
+    statusText.textContent = "Could not load booking status.";
+    return;
+  }
+
+  if (data.status !== "APPROVED") {
+    statusText.textContent = `Status: ${data.status}. Deposit will appear after approval.`;
+    return;
+  }
+
+  statusText.textContent = "Approved! Pay your $1 deposit below.";
+
+  // Use your Square Sandbox App ID + Location ID from env.
+  // For quick testing, we’ll embed them into the page via an endpoint later.
+  // For now, paste your sandbox appId/locationId here:
+  const cfgRes = await fetch('/api/public-config');
+const cfg = await cfgRes.json();
+if (!cfgRes.ok || !cfg.ok) {
+  statusText.textContent = "Could not load payment config.";
+  return;
+}
+
+const applicationId = cfg.applicationId;
+const locationId = cfg.locationId;
+
+
+  const payments = window.Square.payments(applicationId, locationId); // :contentReference[oaicite:3]{index=3}
+  const card = await payments.card();
+  await card.attach('#card-container');
+
+  payBtn.style.display = "inline-flex";
+
+  payBtn.onclick = async () => {
+    depositMsg.style.display = 'block';
+    depositMsg.innerHTML = 'Processing…';
+
+    const tokenResult = await card.tokenize(); // Web Payments SDK returns a one-time token :contentReference[oaicite:4]{index=4}
+    if (tokenResult.status !== "OK") {
+      depositMsg.innerHTML = `<strong>Error:</strong> ${tokenResult.errors?.[0]?.message || "Card tokenize failed"}`;
+      return;
+    }
+
+    const resp = await fetch('/api/deposit/charge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ booking_request_id: bookingId, token: tokenResult.token })
+    });
+
+    const out = await resp.json();
+    if (!resp.ok || !out.ok) {
+      depositMsg.innerHTML = `<strong>Error:</strong> ${out.error || "Payment failed"}`;
+      return;
+    }
+
+    depositMsg.innerHTML = `<strong>Deposit paid!</strong> Status: ${out.status}`;
+    statusText.textContent = "Deposit paid — you’re confirmed.";
+    payBtn.style.display = "none";
+  };
+}
+
+setupDepositUI();
+
+</script>
+</body>
+</html>
