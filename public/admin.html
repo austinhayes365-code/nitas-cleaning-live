@@ -3,69 +3,139 @@
 <head>
   <meta charset="utf-8" />
   <title>Admin – Nita’s Cleaning</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body { font-family: system-ui; background:#f3f4f6; padding:20px }
-    h1 { margin-bottom:10px }
-    .card { background:#fff; padding:14px; border-radius:12px; margin-bottom:12px }
-    button { padding:8px 12px; border-radius:8px; border:1px solid #ccc; cursor:pointer }
+    body { font-family: system-ui; background:#f3f4f6; padding:20px; color:#111827 }
+    h1 { margin:0 0 10px }
+    .muted { color:#6b7280; margin:0 0 14px }
+    .card { background:#fff; padding:14px; border-radius:12px; margin-bottom:12px; border:1px solid #e5e7eb }
+    button { padding:8px 12px; border-radius:10px; border:1px solid #e5e7eb; background:#111827; color:#fff; cursor:pointer }
+    button:disabled { opacity:.5; cursor:not-allowed }
+    .err { color:#b91c1c; white-space:pre-wrap }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+    input { padding:10px 12px; border-radius:10px; border:1px solid #e5e7eb; width:min(420px, 100%) }
   </style>
 </head>
 <body>
   <h1>Pending Booking Requests</h1>
+  <p class="muted">Enter your Admin Key once. Then approve requests.</p>
+
+  <div class="row">
+    <input id="key" placeholder="Paste ADMIN_API_KEY here" />
+    <button id="saveKey">Save Key</button>
+    <button id="refresh">Refresh</button>
+  </div>
+
+  <p id="status" class="muted"></p>
   <div id="list">Loading…</div>
 
-<script>
-  const ADMIN_KEY = prompt("Enter admin key:");
+  <script>
+    const keyInput = document.getElementById('key');
+    const statusEl = document.getElementById('status');
+    const listEl = document.getElementById('list');
 
-  async function load() {
-    const el = document.getElementById('list');
-    try {
-      const res = await fetch('/api/admin/requests', {
-        headers: { 'x-admin-key': ADMIN_KEY || '' }
-      });
+    // Load saved key if present
+    keyInput.value = localStorage.getItem('admin_key') || '';
 
-      // If server returns HTML (like a 404 page), this will fail unless we handle it:
-      const text = await res.text();
-      let data;
-      try { data = JSON.parse(text); } catch { data = { ok:false, error:text.slice(0,200) }; }
-
-      if (!res.ok || !data.ok) {
-        el.innerText = `Error (${res.status}): ${data.error || 'Unauthorized'}`;
-        return;
-      }
-
-      if (!data.pending || data.pending.length === 0) {
-        el.innerText = 'No pending requests.';
-        return;
-      }
-
-      el.innerHTML = data.pending.map(r => `
-        <div class="card">
-          <b>${r.name}</b> – ${r.service}<br/>
-          ${new Date(r.startAt).toLocaleString()}<br/>
-          ${r.email}<br/><br/>
-          <button onclick="approve('${r.id}')">Approve</button>
-        </div>
-      `).join('');
-    } catch (e) {
-      el.innerText = `Error: ${e.message}`;
-    }
-  }
-
-  async function approve(id) {
-    await fetch('/api/admin/approve', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-admin-key': ADMIN_KEY || ''
-      },
-      body: JSON.stringify({ booking_request_id: id })
+    document.getElementById('saveKey').addEventListener('click', () => {
+      localStorage.setItem('admin_key', keyInput.value.trim());
+      statusEl.textContent = 'Admin key saved locally in this browser.';
+      load();
     });
+
+    document.getElementById('refresh').addEventListener('click', load);
+
+    async function api(path, options = {}) {
+      const adminKey = (localStorage.getItem('admin_key') || '').trim();
+      const headers = Object.assign({}, options.headers || {});
+      if (adminKey) headers['x-admin-key'] = adminKey;
+      return fetch(path, Object.assign({}, options, { headers }));
+    }
+
+    async function load() {
+      listEl.textContent = 'Loading…';
+      statusEl.textContent = '';
+
+      try {
+        const res = await api('/api/admin/requests');
+        const text = await res.text();
+
+        let data;
+        try { data = JSON.parse(text); } catch { data = { ok:false, error:text }; }
+
+        if (!res.ok || !data.ok) {
+          listEl.innerHTML = `<div class="err">Error (${res.status}): ${data.error || 'Unauthorized'}</div>`;
+          return;
+        }
+
+        const pending = data.pending || [];
+        if (pending.length === 0) {
+          listEl.textContent = 'No pending requests.';
+          return;
+        }
+
+        // Render cards with real event handlers (no inline onclick)
+        listEl.innerHTML = '';
+        pending.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          const when = new Date(r.startAt).toLocaleString();
+          card.innerHTML = `
+            <div><b>${escapeHtml(r.name)}</b> – ${escapeHtml(r.service)}</div>
+            <div class="muted">${when}</div>
+            <div class="muted">${escapeHtml(r.email)}</div>
+            <div style="height:10px"></div>
+          `;
+
+          const btn = document.createElement('button');
+          btn.textContent = 'Approve';
+          btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            statusEl.textContent = 'Approving…';
+
+            const resp = await api('/api/admin/approve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ booking_request_id: r.id })
+            });
+
+            const outText = await resp.text();
+            let out;
+            try { out = JSON.parse(outText); } catch { out = { ok:false, error: outText }; }
+
+            if (!resp.ok || !out.ok) {
+              statusEl.textContent = `Approve failed (${resp.status}): ${out.error || 'Unknown error'}`;
+              btn.disabled = false;
+              return;
+            }
+
+            statusEl.textContent = 'Approved.';
+            load();
+          });
+
+          card.appendChild(btn);
+          listEl.appendChild(card);
+        });
+
+      } catch (e) {
+        listEl.innerHTML = `<div class="err">Error: ${e.message}</div>`;
+      }
+    }
+
+   function escapeHtml(s) {
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  };
+  return String(s || "").replace(/[&<>"']/g, (ch) => map[ch]);
+}
+
+
     load();
-  }
-
-  load();
-</script>
-
+  </script>
 </body>
 </html>
