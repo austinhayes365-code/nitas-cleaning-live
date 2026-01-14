@@ -5,7 +5,7 @@ const requests = global.__BOOKING_REQUESTS__ || (global.__BOOKING_REQUESTS__ = n
 
 module.exports = async function handler(req, res) {
   // Simple protection
-  const adminKey = req.headers["x-admin-key"];
+  const adminKey = req.headers["6d003ee0e86abec28157b6b2dac789895a75740e9a75e7e047161dbf959397bd"];
   if (adminKey !== process.env.ADMIN_API_KEY) {
     return res.status(401).json({ error: "Unauthorized" });
   }
